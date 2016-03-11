@@ -49,6 +49,14 @@
         "cancels" : ["BADKNEES"]
     },{
         "type" : "mutation",
+        "id" : "RESEARCH",
+        "name" : "Research Photographer",
+        "points" : 1,
+        "description" : "You have an eye for photography! You can study photos you take of monsters to learn how to better combat them.",
+        "starting_trait" : true,
+        "valid" : false
+    },{
+        "type" : "mutation",
         "id" : "GOODCARDIO",
         "name" : "Indefatigable",
         "points" : 2,
