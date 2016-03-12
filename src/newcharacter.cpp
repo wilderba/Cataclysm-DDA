@@ -342,7 +342,7 @@ void player::randomize( const bool random_scenario, points_left &points )
         case 2:
         case 3:
         case 4:
-            if( allow_traits ) {            
+            if( allow_traits ) {
                 rn = random_good_trait();
                 auto &mdata = mutation_branch::get( rn );
                 if( !has_trait(rn) && points.trait_points_left() >= mdata.points &&
@@ -638,6 +638,13 @@ bool player::create(character_type type, std::string tempname)
     // too badly to issue one.
     if (has_trait("ALBINO")) {
         tmp = item("teleumbrella", 0);
+        inv.push_back(tmp);
+    }
+
+    // And researchers have their trusty camera. They might want to
+    // upgrade to Pro sometime, though
+    if (has_trait("RESEARCH")){
+        tmp = item("camera", 0);
         inv.push_back(tmp);
     }
 

@@ -7050,7 +7050,7 @@ int iuse::einktabletpc(player *p, item *it, bool t, const tripoint &pos)
 
 int iuse::camera(player *p, item *it, bool, const tripoint& )
 {
-    enum {c_cancel, c_shot, c_photos, c_upload};
+    enum {c_cancel, c_shot, c_photos, c_research, c_upload};
 
     uimenu amenu;
 
@@ -7060,6 +7060,9 @@ int iuse::camera(player *p, item *it, bool, const tripoint& )
     if (it->get_var( "CAMERA_MONSTER_PHOTOS" ) != "") {
         amenu.addentry(c_photos, true, 'l', _("List photos"));
         amenu.addentry(c_upload, true, 'u', _("Upload photos to memory card"));
+        if(p->has_trait("RESEARCH")){
+            amenu.addentry(c_research, true, 'r', _("Analyze photo"));
+        }
     } else {
         amenu.addentry(c_photos, false, 'l', _("No photos in memory"));
     }
@@ -7236,6 +7239,63 @@ int iuse::camera(player *p, item *it, bool, const tripoint& )
 
         pmenu.selected = 0;
         pmenu.text = _("Critter photos saved on camera:");
+        pmenu.addentry(0, true, 'q', _("Cancel"));
+
+        std::vector<mtype_id> monster_photos;
+
+        std::istringstream f(it->get_var( "CAMERA_MONSTER_PHOTOS" ));
+        std::string s;
+        int k = 1;
+        while (getline(f, s, ',')) {
+
+            if (s.size() == 0) {
+                continue;
+            }
+
+            monster_photos.push_back( mtype_id( s ) );
+
+            std::string menu_str;
+
+            const monster dummy( monster_photos.back() );
+            menu_str = dummy.name();
+
+            getline(f, s, ',');
+            char *chq = &s[0];
+            const int quality = atoi(chq);
+
+            menu_str += " [" + photo_quality_name( quality ) + "]";
+
+            pmenu.addentry(k++, true, -1, menu_str.c_str());
+        }
+
+        int choice;
+        do {
+            pmenu.query();
+            choice = pmenu.ret;
+
+            if (0 == choice) {
+                break;
+            }
+
+            const monster dummy( monster_photos[choice - 1] );
+            popup(dummy.type->description.c_str());
+
+        } while (true);
+
+        return it->type->charges_to_use();
+    }
+
+    if (c_research == choice) {
+
+        if (p->has_effect( effect_blind) || p->worn_with_flag("BLIND")) {
+            p->add_msg_if_player(_("You can't see the camera screen, you're blind."));
+            return 0;
+        }
+
+        uimenu pmenu;
+
+        pmenu.selected = 0;
+        pmenu.text = _("Analyze which photo?");
         pmenu.addentry(0, true, 'q', _("Cancel"));
 
         std::vector<mtype_id> monster_photos;
