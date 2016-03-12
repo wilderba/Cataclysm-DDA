@@ -437,6 +437,10 @@ class Character : public Creature, public visitable<Character>
         SkillLevel &skillLevel(Skill const &_skill);
         SkillLevel &skillLevel(const skill_id &ident);
 
+        // --------------- Research Stuff ---------------
+        std::tuple<bool,bool,bool> research(const std::string mtype);
+        void set_research(const std::string mtype, std::tuple<bool,bool,bool> value);
+
         /** for serialization */
         SkillLevel const& get_skill_level(const Skill* _skill) const;
         SkillLevel const& get_skill_level(const Skill &_skill) const;
@@ -573,6 +577,10 @@ class Character : public Creature, public visitable<Character>
         int hunger, stomach_food, stomach_water;
 
         std::map<const Skill*, SkillLevel> _skills;
+
+        // Map of mtypes to research progress. 0 is HP bars, 1 is armor,
+        // 2 is crit bonus
+        std::map<const std::string, std::tuple<bool,bool,bool>> _research;
 
         // Cached vision values.
         std::bitset<NUM_VISION_MODES> vision_mode_cache;

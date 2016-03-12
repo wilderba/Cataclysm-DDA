@@ -947,6 +947,14 @@ bool Character::worn_with_flag( std::string flag ) const
     return false;
 }
 
+std::tuple<bool,bool,bool> Character::research(const std::string mtype){
+    return _research[mtype];
+}
+
+void Character::set_research(const std::string mtype, std::tuple<bool,bool,bool> value){
+    _research[mtype] = value;
+}
+
 SkillLevel& Character::skillLevel(const skill_id &ident)
 {
     if( !ident ) {

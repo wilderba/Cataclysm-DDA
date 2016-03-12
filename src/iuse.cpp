@@ -7326,18 +7326,29 @@ int iuse::camera(player *p, item *it, bool, const tripoint& )
         }
 
         int choice;
-        do {
-            pmenu.query();
-            choice = pmenu.ret;
-
-            if (0 == choice) {
-                break;
-            }
-
+        pmenu.query();
+        choice = pmenu.ret;
+        if (0 != choice) {
             const monster dummy( monster_photos[choice - 1] );
-            popup(dummy.type->description.c_str());
-
-        } while (true);
+            std::tuple<bool,bool,bool> rstatus = p->research(dummy.type->id.str());
+            if(!std::get<0>(rstatus)){
+                popup(_("You conduct research on %s."), dummy.get_name().c_str());
+                //TODO: actual research results
+                // Remove photo of monster when researched
+                const size_t strpos = it->get_var( "CAMERA_MONSTER_PHOTOS" ).find(dummy.type->id.str() + ",");
+                const size_t len = dummy.type->id.str().size() + 3;
+                it->set_var("CAMERA_MONSTER_PHOTOS", (it->get_var( "CAMERA_MONSTER_PHOTOS" ).erase(strpos,len)));
+                // If this was the last photo in memory, clean up extra comma
+                if(it->get_var("CAMERA_MONSTER_PHOTOS") == ","){
+                    it->set_var("CAMERA_MONSTER_PHOTOS", "");
+                }
+                std::get<0>(rstatus) = true;
+                p->set_research(dummy.type->id.str(), rstatus);
+            }else{
+                popup(_("You've already fully researched %s."), dummy.get_name().c_str());
+            }
+            return it->type->charges_to_use();
+        }
 
         return it->type->charges_to_use();
     }

@@ -9932,6 +9932,10 @@ int game::list_monsters(const int iLastState)
 
                         if( m != nullptr ) {
                             m->get_HP_Bar(color, sText);
+                            // Photo Research means you can see their numbers!
+                            if(u.has_trait("RESEARCH") && std::get<0>(u.research(m->type->id.str()))){
+                                sText = std::to_string(critter->get_hp());
+                            }
                         } else {
                             std::tie(sText, color) =
                                 ::get_hp_bar( critter->get_hp(), critter->get_hp_max(), false );
